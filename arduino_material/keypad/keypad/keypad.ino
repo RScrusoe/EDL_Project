@@ -10,6 +10,8 @@
 
 */
 #include <Keypad.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 const byte ROWS = 4; // Four rows
 const byte COLS = 3; // Three columns
@@ -42,8 +44,11 @@ void loop()
 
   char key = kpd.getKey();
 
+
   if (key) // Check for a valid key.
-  { Serial.println(key);
+  {  char s[] = key;
+    int num = atoi(s); Serial.println(num * 10);
+
     //    switch (key)
     //    {
     //      case '*':
