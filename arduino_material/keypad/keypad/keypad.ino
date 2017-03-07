@@ -9,9 +9,7 @@
     match your setup.
 
   Coneect Pin (1 thru 8 ) of keypad (If we hold keypad facing ourside, leftmost pin is Pin 1)to Arduino Pin (9 thru 2)
-
-
-
+  
 */
 #include <Keypad.h>
 #include <stdlib.h>
@@ -48,11 +46,16 @@ void setup()
 void loop()
 {
   int x = get_temp();
+  
   Serial.println(x);
+  if(x<16){
+    Serial.println("Tere baap ne itna temperature kam kiya tha kya BC???  >:(");
+    }
 }
 
 int get_temp()
 {
+  
   char key = kpd.waitForKey();
   int temp = 0;
   if (key) // Check for a valid key.
