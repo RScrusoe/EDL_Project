@@ -1,6 +1,6 @@
 int val;
 int tempPin = 1;
-int volt_out = 4.5
+int volt_out = 4.5;
 void setup()
 {
 Serial.begin(9600);
