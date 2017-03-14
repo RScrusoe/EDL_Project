@@ -1,14 +1,13 @@
 int freq = 1000;
-float pwm = 0.60;
+//float pwm = 0.60;
 float max_pwm = 1;
 float pwm_step = 0.05;
 int pwm_pin = 9;
 int duty;
-int timeForOneDC = 1000;   //in miliseconds
+//int timeForOneDC = 1000;   //in miliseconds
 int val;
 int tempPin = A0;
-int volt_out = 4.5;
-float temp_setpoint = 20;
+float temp_setpoint = 60;
 float curr_temp,old_temp, error = 0;
 float Kp = 0.01;
 float Kd = 0;
@@ -48,9 +47,10 @@ void loop()
       new_pwm = 0.95;
     }
     duty = new_pwm * 255;
+    Serial.print(duty);
     analogWrite(pwm_pin, duty);
     Serial.println(new_pwm);
-    delay(60000);
+    delay(15000);
     curr_temp = get_temp();
     
     if(!flag)

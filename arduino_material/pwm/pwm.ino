@@ -1,5 +1,5 @@
 int freq = 1000;
-float pwm = 0.90;
+float pwm = 0.60;
 float max_pwm = 1;
 float pwm_step = 0.05;
 int ledpin = 9;
