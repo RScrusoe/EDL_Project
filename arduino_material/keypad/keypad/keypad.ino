@@ -27,7 +27,7 @@ char keys[ROWS][COLS] = {
   {'*', '0', '#'}
 };
 // Connect keypad ROW0, ROW1, ROW2 and ROW3 to these Arduino pins.
-byte rowPins[ROWS] = { 9, 8, 7, 6 };
+byte rowPins[ROWS] = { A5, 8, 7, 6 };
 // Connect keypad COL0, COL1 and COL2 to these Arduino pins.
 byte colPins[COLS] = { 5, 4, 3 };
 
@@ -45,7 +45,7 @@ void setup()
 
 void loop()
 {
-  int x = get_temp();
+  int x = get_input_temp();
   
   Serial.println(x);
   if(x<16){
@@ -53,7 +53,7 @@ void loop()
     }
 }
 
-int get_temp()
+int get_input_temp()
 {
   
   char key = kpd.waitForKey();

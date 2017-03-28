@@ -3,7 +3,7 @@
 
 from time import sleep
 import serial
-arduino = serial.Serial('/dev/ttyACM0', 9600) # Establish the connection on a specific port
+arduino = serial.Serial('/dev/ttyACM1', 9600) # Establish the connection on a specific port
 counter = 32 # Below 32 everything in ASCII is gibberish
 arduino.write(b"My name is Crusoe!")
 while True:

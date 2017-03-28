@@ -1,5 +1,5 @@
 int freq = 1000;
-float pwm = 0.60;
+float pwm = 0.99;
 float max_pwm = 1;
 float pwm_step = 0.05;
 int ledpin = 9;
@@ -16,7 +16,7 @@ void setup()
 
 void loop()
 {
-  analogWrite(ledpin, duty);
+  analogWrite(ledpin, pwm*255);
   float curr_temp = get_temp();
 //  while (1) 
 //  {
