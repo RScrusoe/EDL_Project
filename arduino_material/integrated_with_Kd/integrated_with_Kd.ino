@@ -14,12 +14,10 @@ void setup()
 }
 
 void loop()
-{analogWrite(pwm_pin,252);
-  while (1) {}
+{
   initial_temp = get_temp();
   Serial.print("Enter input Temperature using keypad:: ");
-  //temp_setpoint = get_input_temp();
-  temp_setpoint = 100;
+  temp_setpoint = get_input_temp();
   Serial.println(temp_setpoint);
     
   if(initial_temp>temp_setpoint)
@@ -47,6 +45,7 @@ void loop()
     old_temp = curr_temp;
     
     new_pwm = old_pwm + error*Kp;// + Kd*(error-prev_error));
+    prev_error = error;
     if (new_pwm >= 1) 
     {
       new_pwm = 0.95;
