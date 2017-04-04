@@ -14,16 +14,16 @@ void setup()
 }
 
 void loop()
-{ 
+{analogWrite(pwm_pin,252);
+  while (1) {}
   initial_temp = get_temp();
   Serial.print("Enter input Temperature using keypad:: ");
-  temp_setpoint = get_input_temp();
+  //temp_setpoint = get_input_temp();
+  temp_setpoint = 100;
   Serial.println(temp_setpoint);
     
-  
   if(initial_temp>temp_setpoint)
   {
-    
     Serial.println("Writing Relay -> LOW");
     analogWrite(relay_pin,0);
   }
@@ -34,22 +34,24 @@ void loop()
   }
   curr_temp = get_temp();
   error = temp_setpoint - curr_temp;
+  prev_error = error;
   if (error<0)
   {
     flag = 0;
     error = error * (-1);
+    prev_error = error;
   }
   while (abs(error) >=2 || ct <=5)
   {
-    
+    curr_time = millis()/1000.0;
     old_temp = curr_temp;
     
-    new_pwm = old_pwm + error * Kp;
+    new_pwm = old_pwm + error*Kp;// + Kd*(error-prev_error));
     if (new_pwm >= 1) 
     {
       new_pwm = 0.95;
     }
-    duty = 0.95 * 255;
+    duty = 0.99 * 255;
     //duty = new_pwm * 255;
     analogWrite(pwm_pin, duty);
     current_current = find_current();
@@ -57,7 +59,7 @@ void loop()
     Serial.print("  ||  current = ");
     Serial.print(current_current);
     Serial.print("V  ||  time in secs: ");
-    Serial.print((millis())/1000.0);  
+    Serial.print(curr_time);  
     Serial.print("  ||  ");
     Serial.print(curr_temp);
     Serial.print("  ||  ");

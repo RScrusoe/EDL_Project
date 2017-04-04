@@ -41,7 +41,7 @@ int tempPin = A0;
 float temp_setpoint = 15;
 float curr_temp,old_temp, error = 0;
 float Kp = 0.002;
-float Kd = 0;
+float Kd = 0.01;
 float Ki = 0;
 float initial_temp;
 int ct=0;
@@ -55,10 +55,10 @@ float current_current;
 int get_input_temp();
 float get_temp();
 float find_current();
+float curr_time,prev_error=0;
 
 int get_input_temp()
-{
-  
+{  
   char key = kpd.waitForKey();
   int temp = 0;
   if (key) // Check for a valid key.
@@ -118,5 +118,3 @@ void print_iv(float Vd)
     Serial.print("\t");
     Serial.println(current);
 }
-
-
