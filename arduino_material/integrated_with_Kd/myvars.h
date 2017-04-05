@@ -9,7 +9,7 @@ float Vd;
 byte data = 0; // and a byte is an 8-bit number
 float in_volt;
 float current;
-float resistor = 1; // in kohms
+float resistor = 0.33; // in kohms
 void send_data(int a);
 void print_iv(float Vd);
 int diode_pin = A1;
@@ -51,11 +51,12 @@ float new_pwm = 0;
 int current_read_pin = A2;
 int lm35_5volt_pin = A3; 
 float current_current;
+float curr_time,prev_error=0;
 
 int get_input_temp();
 float get_temp();
 float find_current();
-float curr_time,prev_error=0;
+
 
 int get_input_temp()
 {  

@@ -11,34 +11,25 @@ void setup()
   SPI.begin(); // wake up the SPI bus.
   SPI.setBitOrder(MSBFIRST);
   Serial.begin(9600);
+  
+  randomSeed(analogRead(0));
+  myGLCD.InitLCD();
+  myGLCD.setFont(SmallFont);
 }
 
 void loop()
 {
+  ask_temps();
   Serial.print("Enter input Temperature using keypad:: ");
   temp_setpoint = get_input_temp();
   Serial.println(temp_setpoint);
   achieve_temp(temp_setpoint);  
-//Serial.print(ct);
-  while (1) {}
-//while(1)
-//{
   
-  
-//}
-  //  while (1)
-  //  {
-  //    duty = pwm * 255;
-  //    if (duty >= 255)
-  //    {
-  //      pwm = 0.0;
-  //    }
-  //
-  //    analogWrite(pwm_pin, duty);
-  //    delay(2000);
-  //    pwm = pwm + pwm_step;
-  //  }
 
+
+
+  while (1) {}
+  
 }
 
 

@@ -13,9 +13,35 @@ void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
 
+
+//  randomSeed(analogRead(0));
+// Setup the LCD
+  myGLCD.InitLCD();
+  myGLCD.setFont(SmallFont);
+  Serial.begin(9600);
+  tft_init();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  byte * temp_array;
+  temp_array = ask_temps();
+  
+  int n = sizeof(temp_array);
+  Serial.println();
+  for (int i=0;i<=n;i++)
+  {
+    
+    tft_init();
+    myGLCD.setColor(51, 204, 51);  //Greenish
+    myGLCD.print("Achieving Temperature : " + String(i) + "*C", CENTER, 100);
+    Serial.println(temp_array[i]);
+    achieve_temp(i, temp_array[i]);
+  }
 
+  for (int i=0;i<=n;i++)
+  {
+    plot_iv(i);
+  }
+  // put your main code here, to run repeatedly:
+  delay(50000);
 }

@@ -1,5 +1,20 @@
 #pragma once
 #include "myvars.h"
+
+void tft_init();
+void plot_iv( int count);
+byte *ask_temps();
+float maxNum(float *z, int zsize);
+float minNum(float *z, int zsize);
+int get_input_temp();
+float find_current();
+float get_temp();
+void send_data(int a);
+void print_iv(float Vd);
+void achieve_temp(int count, int temp_setpoint);
+void isort(byte *a, int n);
+
+
 void tft_init()
 {
   myGLCD.clrScr();
@@ -19,16 +34,17 @@ void tft_init()
  
 }
  
-void plot_iv(float *x, float *y, int xsize)
+void plot_iv(int count)
 {
+  int xsize = 21;
   myGLCD.setColor(0, 0, 255);
   myGLCD.drawLine(10, 218, 318, 218);
   myGLCD.drawLine(10, 15 , 10, 218);
 
-  myGLCD.fillCircle(10,15,5);   //TOP LEFT
-  myGLCD.fillCircle(310,15,5);  //TOP RIGHT
-  myGLCD.fillCircle(310,218,5); //BOTTOM RIGHT
-  myGLCD.fillCircle(10,218,5);  //BOTTOM LEFT
+//  myGLCD.fillCircle(10,15,5);   //TOP LEFT
+//  myGLCD.fillCircle(310,15,5);  //TOP RIGHT
+//  myGLCD.fillCircle(310,218,5); //BOTTOM RIGHT
+//  myGLCD.fillCircle(10,218,5);  //BOTTOM LEFT
 
   float xpixel [xsize];
   float ypixel [xsize];
@@ -36,8 +52,8 @@ void plot_iv(float *x, float *y, int xsize)
   int i = 0;
   for(i=0;i<xsize;i++)
   {
-    xpixel[i] = 10 + x[i] * (310.0 - 10.0)/ (1.0-0.0);
-    ypixel[i] = (218.0 - y[i] * (218.0-15.0)/(5.0-0.0) ) ;//          (float) map(y[i],0.0,15.0,15.0,218.0);
+    xpixel[i] = 10 + iv_data[2*count][i] * (310.0 - 10.0)/ (1.0-0.0);
+    ypixel[i] = (218.0 - iv_data[2*count + 1][i] * (218.0-15.0)/(5.0-0.0) ) ;//          (float) map(y[i],0.0,15.0,15.0,218.0);
     Serial.println(i + String(") ") + xpixel[i]+ String(" || ") + ypixel[i]);
   }
   i=0;
@@ -58,21 +74,22 @@ void plot_iv(float *x, float *y, int xsize)
 
 }
  
-
-void ask_temps()
+byte * ask_temps()
 {
   myGLCD.print("Please Enter Number Of Temperatures :: ", CENTER, 100);
-  int n = 3; //get_input_temp();
-//  byte temp_array[n];
-  byte temp_array[3] = {65,12,45}; 
+  int n = get_input_temp();
+  myGLCD.print("You Entered -> " + String(n), CENTER, 50);
+  byte temp_array[n];
+//  byte temp_array[3] = {65,12,45}; 
   while(n>0)
   {
-//    temp_array[n-1] = get_input_temp();
-    myGLCD.print(String(temp_array[n-1]), CENTER, 100+n*20);
+    temp_array[n-1] = get_input_temp();
+    myGLCD.print(String(temp_array[n-1]) + "*C", CENTER, 50+n*20);
     n=n-1;
   }
   
   isort(temp_array,sizeof(temp_array));
+  return temp_array;
 }
  
 float maxNum(float *z, int zsize)
@@ -98,7 +115,7 @@ float minNum(float *z, int zsize)
   return min_val;
 }
 
-nt get_input_temp()
+int get_input_temp()
 {  
   char key = kpd.waitForKey();
   int temp = 0;
@@ -160,8 +177,9 @@ void print_iv(float Vd)
     Serial.println(current);
 }
 
-void achieve_temp(int temp_setpoint)
+void achieve_temp(int count, int temp_setpoint)
 {
+  int z = 0;
   initial_temp = get_temp();
 
   if(initial_temp>temp_setpoint)
@@ -225,15 +243,37 @@ void achieve_temp(int temp_setpoint)
   Serial.println("Done!!!");
   Serial.print("Setting duty at ");Serial.println(new_pwm);
   Serial.print("Maintaining Temperature at "); Serial.print(temp_setpoint); Serial.println(" *C");
-  analogWrite(pwm_pin, duty);  
-    for (int a = 0; a <= 4095; a = a + 50 )
+  analogWrite(pwm_pin, duty);
+
+  for (int a = 0; a <= 4095; a = a + 200 )
   { 
     in_volt = a;
     send_data(a);
     Vd = analogRead(diode_pin);
-    print_iv(Vd);
+    
+    Vd = (Vd / 1024) * 5;
+    in_volt = (in_volt / 4096) * 5;
+    current = (in_volt - Vd) / resistor;  
+    
+    iv_data[2*count][z] = Vd;
+    iv_data[2*count + 1][z] = current;
+    
+//    print_iv(Vd);
   }
   Serial.println();
-  
+
 }
 
+void isort(byte *a, int n)
+{
+ for (int i = 1; i < n; ++i)
+ {
+   int j = a[i];
+   int k;
+   for (k = i - 1; (k >= 0) && (j < a[k]); k--)
+   {
+     a[k + 1] = a[k];
+   }
+   a[k + 1] = j;
+ }
+}

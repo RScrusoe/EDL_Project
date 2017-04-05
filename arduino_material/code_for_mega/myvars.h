@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "SPI.h" // necessary library
-#define DATAOUT     11  //MOSI
-#define SPICLOCK    13  //sck
-#define SLAVESELECT 10  //ss
+#define DATAOUT     51 //51 for Mega   //11for UNO //MOSI    //MCP Pin 4
+#define SPICLOCK    52 //52 for Mega   // 13 for UNO //sck   //MCP Pin 3
+#define SLAVESELECT 53 //53 for Mega   //10  for UNO  //ss   //MCP Pin 2
 #include <UTFT.h>
 extern uint8_t SmallFont[];
 
@@ -38,9 +38,7 @@ float Vd;
 byte data = 0; // and a byte is an 8-bit number
 float in_volt;
 float current;
-float resistor = 1; // in kohms
-void send_data(int a);
-void print_iv(float Vd);
+float resistor = 0.33; // in kohms
 int diode_pin = A1;
 int relay_pin = A4;
 const byte ROWS = 4; // Four rows
@@ -58,13 +56,9 @@ byte rowPins[ROWS] = { A5, 8, 7, 6 };
 byte colPins[COLS] = { 5, 4, 3 };
 // Create the Keypad
 Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
-int freq = 1000;
-//float pwm = 0.60;
-float max_pwm = 1;
-float pwm_step = 0.05;
+
 int pwm_pin = 9;
 int duty;
-//int timeForOneDC = 1000;   //in miliseconds
 int val;
 int tempPin = A0;
 float temp_setpoint = 15;
@@ -80,4 +74,5 @@ float new_pwm = 0;
 int current_read_pin = A2;
 int lm35_5volt_pin = A3; 
 float current_current;
-
+float curr_time,prev_error=0;
+float iv_data[10][21];

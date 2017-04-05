@@ -106,17 +106,17 @@ void ask_temps()
   isort(temp_array,sizeof(temp_array));
 }
  
-//float maxNum(float *z, int zsize)
-//{
-//  int i = 0;
-//  int max_val = z[0];
-//  for (i = 0; i < zsize; i++)
-//  {
-//    max_val = max(max_val, z[i]);
-//  }
-//  return max_val;
-//}
-// 
+float maxNum(float *z, int zsize)
+{
+  int i = 0;
+  int max_val = z[0];
+  for (i = 0; i < zsize; i++)
+  {
+    max_val = max(max_val, z[i]);
+  }
+  return max_val;
+}
+
 float minNum(float *z, int zsize)
 {
   int i = 0;
