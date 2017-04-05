@@ -1,5 +1,5 @@
 #include "myfiles.h"
-
+#include "hardware.h"
 void setup()
 {
   randomSeed(analogRead(0));
@@ -14,7 +14,6 @@ void setup()
 
 
 void loop() {
-  //Serial.print("@");
   tft_init();
   ask_temps();
   delay(3000);

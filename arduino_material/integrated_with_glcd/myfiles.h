@@ -1,5 +1,6 @@
+#pragma once
 #include <UTFT.h>
- 
+#include "hardware.h" 
 // Declare which fonts we will be using
 extern uint8_t SmallFont[];
  
@@ -66,7 +67,7 @@ void plot_iv(float *x, float *y, int xsize)
   int i = 0;
   for(i=0;i<xsize;i++)
   {
-    xpixel[i] = x[i] * (310.0 - 10.0)/ (1.0-0.0);
+    xpixel[i] = 10 + x[i] * (310.0 - 10.0)/ (1.0-0.0);
     ypixel[i] = (218.0 - y[i] * (218.0-15.0)/(5.0-0.0) ) ;//          (float) map(y[i],0.0,15.0,15.0,218.0);
     Serial.println(i + String(") ") + xpixel[i]+ String(" || ") + ypixel[i]);
   }
@@ -92,6 +93,17 @@ void plot_iv(float *x, float *y, int xsize)
 void ask_temps()
 {
   myGLCD.print("Please Enter Number Of Temperatures :: ", CENTER, 100);
+  int n = 3; //get_input_temp();
+//  byte temp_array[n];
+  byte temp_array[3] = {65,12,45}; 
+  while(n>0)
+  {
+//    temp_array[n-1] = get_input_temp();
+    myGLCD.print(String(temp_array[n-1]), CENTER, 100+n*20);
+    n=n-1;
+  }
+  
+  isort(temp_array,sizeof(temp_array));
 }
  
 //float maxNum(float *z, int zsize)
@@ -105,17 +117,17 @@ void ask_temps()
 //  return max_val;
 //}
 // 
-//float minNum(float *z, int zsize)
-//{
-//  int i = 0;
-//  //  int max_val =*x;
-//  int min_val = z[0];
-//  for (i = 0; i < zsize; i++)
-//  {
-//    min_val = min(min_val, z[i]);
-//  }
-//  return min_val;
-//}
+float minNum(float *z, int zsize)
+{
+  int i = 0;
+  //  int max_val =*x;
+  int min_val = z[0];
+  for (i = 0; i < zsize; i++)
+  {
+    min_val = min(min_val, z[i]);
+  }
+  return min_val;
+}
 
 
 

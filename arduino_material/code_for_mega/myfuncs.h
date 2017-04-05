@@ -1,63 +1,104 @@
-#include <Keypad.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "SPI.h" // necessary library
-#define DATAOUT     11  //MOSI
-#define SPICLOCK    13  //sck
-#define SLAVESELECT 10  //ss
-float Vd;
-byte data = 0; // and a byte is an 8-bit number
-float in_volt;
-float current;
-float resistor = 1; // in kohms
-void send_data(int a);
-void print_iv(float Vd);
-int diode_pin = A1;
-int relay_pin = A4;
-const byte ROWS = 4; // Four rows
-const byte COLS = 3; // Three columns
-// Define the Keymap
-char keys[ROWS][COLS] = {
-  {'1', '2', '3'},
-  {'4', '5', '6'},
-  {'7', '8', '9'},
-  {'*', '0', '#'}
-};
-// Connect keypad ROW0, ROW1, ROW2 and ROW3 to these Arduino pins.
-byte rowPins[ROWS] = { A5, 8, 7, 6 };
-// Connect keypad COL0, COL1 and COL2 to these Arduino pins.
-byte colPins[COLS] = { 5, 4, 3 };
-// Create the Keypad
-Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
-int freq = 1000;
-//float pwm = 0.60;
-float max_pwm = 1;
-float pwm_step = 0.05;
-int pwm_pin = 9;
-int duty;
-//int timeForOneDC = 1000;   //in miliseconds
-int val;
-int tempPin = A0;
-float temp_setpoint = 15;
-float curr_temp,old_temp, error = 0;
-float Kp = 0.002;
-float Kd = 0.01;
-float Ki = 0;
-float initial_temp;
-int ct=0;
-bool flag=1;
-float old_pwm = 0;
-float new_pwm = 0;
-int current_read_pin = A2;
-int lm35_5volt_pin = A3; 
-float current_current;
+#pragma once
+#include "myvars.h"
+void tft_init()
+{
+  myGLCD.clrScr();
+  myGLCD.setColor(255, 0, 0);
+  myGLCD.fillRect(0, 0, 319, 13);
+  myGLCD.setColor(64, 64, 64);
+  myGLCD.fillRect(0, 226, 319, 239);
+  myGLCD.setColor(255, 255, 255);
+  myGLCD.setBackColor(255, 0, 0);
+  myGLCD.print("* PELTIER TEMPERATURE SETTABLE PLATFORM*", CENTER, 1);
+  myGLCD.setBackColor(64, 64, 64);
+  myGLCD.setColor(255, 255, 0);
+  myGLCD.print("YASHASWI  |  RAHUL  | UDAY", CENTER, 227);
+ 
+  myGLCD.setColor(0, 0, 255);
+  //myGLCD.drawRect(0, 14, 319, 225);
+ 
+}
+ 
+void plot_iv(float *x, float *y, int xsize)
+{
+  myGLCD.setColor(0, 0, 255);
+  myGLCD.drawLine(10, 218, 318, 218);
+  myGLCD.drawLine(10, 15 , 10, 218);
 
-int get_input_temp();
-float get_temp();
-float find_current();
-float curr_time,prev_error=0;
+  myGLCD.fillCircle(10,15,5);   //TOP LEFT
+  myGLCD.fillCircle(310,15,5);  //TOP RIGHT
+  myGLCD.fillCircle(310,218,5); //BOTTOM RIGHT
+  myGLCD.fillCircle(10,218,5);  //BOTTOM LEFT
 
-int get_input_temp()
+  float xpixel [xsize];
+  float ypixel [xsize];
+
+  int i = 0;
+  for(i=0;i<xsize;i++)
+  {
+    xpixel[i] = 10 + x[i] * (310.0 - 10.0)/ (1.0-0.0);
+    ypixel[i] = (218.0 - y[i] * (218.0-15.0)/(5.0-0.0) ) ;//          (float) map(y[i],0.0,15.0,15.0,218.0);
+    Serial.println(i + String(") ") + xpixel[i]+ String(" || ") + ypixel[i]);
+  }
+  i=0;
+  myGLCD.setColor(255, 255, 0);
+  for(i=0;i<(xsize-1);i++)
+  {
+    myGLCD.drawLine(xpixel[i],ypixel[i],xpixel[i+1],ypixel[i+1]);
+  }
+  i=0;
+  Serial.println("@@@");
+  myGLCD.setColor(255, 0, 0);
+  for(i=0;i<xsize;i++)
+  { 
+    
+    myGLCD.fillCircle( xpixel[i],ypixel[i],3);
+  }
+  
+
+}
+ 
+
+void ask_temps()
+{
+  myGLCD.print("Please Enter Number Of Temperatures :: ", CENTER, 100);
+  int n = 3; //get_input_temp();
+//  byte temp_array[n];
+  byte temp_array[3] = {65,12,45}; 
+  while(n>0)
+  {
+//    temp_array[n-1] = get_input_temp();
+    myGLCD.print(String(temp_array[n-1]), CENTER, 100+n*20);
+    n=n-1;
+  }
+  
+  isort(temp_array,sizeof(temp_array));
+}
+ 
+float maxNum(float *z, int zsize)
+{
+  int i = 0;
+  int max_val = z[0];
+  for (i = 0; i < zsize; i++)
+  {
+    max_val = max(max_val, z[i]);
+  }
+  return max_val;
+}
+
+float minNum(float *z, int zsize)
+{
+  int i = 0;
+  //  int max_val =*x;
+  int min_val = z[0];
+  for (i = 0; i < zsize; i++)
+  {
+    min_val = min(min_val, z[i]);
+  }
+  return min_val;
+}
+
+nt get_input_temp()
 {  
   char key = kpd.waitForKey();
   int temp = 0;

@@ -1,3 +1,4 @@
+#pragma once
 #include <Keypad.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,7 +42,7 @@ int tempPin = A0;
 float temp_setpoint = 15;
 float curr_temp,old_temp, error = 0;
 float Kp = 0.002;
-float Kd = 0.01;
+float Kd = 0;
 float Ki = 0;
 float initial_temp;
 int ct=0;
@@ -55,10 +56,10 @@ float current_current;
 int get_input_temp();
 float get_temp();
 float find_current();
-float curr_time,prev_error=0;
-
+void isort(byte *a, int n);
 int get_input_temp()
-{  
+{
+  
   char key = kpd.waitForKey();
   int temp = 0;
   if (key) // Check for a valid key.
@@ -119,80 +120,17 @@ void print_iv(float Vd)
     Serial.println(current);
 }
 
-void achieve_temp(int temp_setpoint)
+void isort(byte *a, int n)
 {
-  initial_temp = get_temp();
-
-  if(initial_temp>temp_setpoint)
-  {
-    Serial.println("Writing Relay -> LOW");
-    analogWrite(relay_pin,0);
-  }
-  else
-  {
-    Serial.println("Writing Relay -> HIGH");
-    analogWrite(relay_pin,255);
-  }
-  curr_temp = get_temp();
-  error = temp_setpoint - curr_temp;
-  prev_error = error;
-  if (error<0)
-  {
-    flag = 0;
-    error = error * (-1);
-    prev_error = error;
-  }
-  while (abs(error) >=2 || ct <=5)
-  {
-    curr_time = millis()/1000.0;
-    old_temp = curr_temp;
-    myGLCD.drawPixel(10.0 + curr_time*(310.0-10.0)/1000.0, 218.0 - curr_temp*(218.0-15.0)/(70.0-5.0));      // Assuming max time takes is 1000s;
-    new_pwm = old_pwm + error*Kp;// + Kd*(error-prev_error));
-    prev_error = error;
-    if (new_pwm >= 1) 
-    {
-      new_pwm = 0.95;
-    }
-    duty = 0.99 * 255;
-    //duty = new_pwm * 255;
-    analogWrite(pwm_pin, duty);
-    current_current = find_current();
-    Serial.print(duty);
-    Serial.print("  ||  current = ");
-    Serial.print(current_current);
-    Serial.print("V  ||  time in secs: ");
-    Serial.print(curr_time);  
-    Serial.print("  ||  ");
-    Serial.print(curr_temp);
-    Serial.print("  ||  ");
-    Serial.println(new_pwm);
-    delay(10000);
-    curr_temp = get_temp();
-    if(!flag)
-    {
-      error = curr_temp - temp_setpoint;
-    }
-    else
-    {
-      error = temp_setpoint - curr_temp;
-    }
-    old_pwm = new_pwm;
-    if(ct >= 1 && abs(temp_setpoint - curr_temp) > 2){ct=0;}
-    if (abs(temp_setpoint - curr_temp) < 2){ct= ct + 1;}
-    
-  }
-  Serial.println("Done!!!");
-  Serial.print("Setting duty at ");Serial.println(new_pwm);
-  Serial.print("Maintaining Temperature at "); Serial.print(temp_setpoint); Serial.println(" *C");
-  analogWrite(pwm_pin, duty);  
-    for (int a = 0; a <= 4095; a = a + 50 )
-  { 
-    in_volt = a;
-    send_data(a);
-    Vd = analogRead(diode_pin);
-    print_iv(Vd);
-  }
-  Serial.println();
-  
+ for (int i = 1; i < n; ++i)
+ {
+   int j = a[i];
+   int k;
+   for (k = i - 1; (k >= 0) && (j < a[k]); k--)
+   {
+     a[k + 1] = a[k];
+   }
+   a[k + 1] = j;
+ }
 }
 
