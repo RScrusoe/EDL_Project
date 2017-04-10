@@ -1,8 +1,8 @@
 
 #include "SPI.h" // necessary library
-#define DATAOUT     11  //MOSI
-#define SPICLOCK    13  //sck
-#define SLAVESELECT 10  //ss
+#define DATAOUT      51   // 11  //MOSI
+#define SPICLOCK     52 //  13  //sck
+#define SLAVESELECT  10  // 10  //ss
 float Vd;
 byte data = 0; // and a byte is an 8-bit number
 float in_volt;
@@ -23,15 +23,15 @@ void setup()
 void loop()
 {
 
-  for (int a = 0; a <= 4095; a = a + 50 )
+  for (int a = 0; a <= 4095; a = a + 150 )
   { 
     in_volt = a;
     send_data(a);
     Vd = analogRead(diode_pin);
-    print_iv(Vd);
+    //print_iv(Vd);
   }
   //Serial.print(ct);
-  while (1) {}
+//  while (1) {}
   //  for (int a=4095; a>=0; --a)
   //  {
   //    outputValue = a;

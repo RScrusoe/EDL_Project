@@ -23,22 +23,28 @@ void setup() {
 }
 
 void loop() {
-  byte * temp_array;
-  temp_array = ask_temps();
+
+  while(1){Serial.println(analogRead(diode_pin));}
   
-  int n = sizeof(temp_array);
-  Serial.println();
-  for (int i=0;i<=n;i++)
+  int n = ask_temps();
+  Serial.println("size = " + String(n));
+  for(int i = 0;i<n;i++){Serial.println(temp_array[i]);}
+  Serial.println("@@@");
+  for (int i=0;i<n;i++)
   {
     
     tft_init();
     myGLCD.setColor(51, 204, 51);  //Greenish
-    myGLCD.print("Achieving Temperature : " + String(i) + "*C", CENTER, 100);
+    myGLCD.print("Achieving Temperature : " + String(temp_array[i]) + "*C", CENTER, 100);
+    delay(3000);
+    tft_init();
+    plot_axis();
     Serial.println(temp_array[i]);
     achieve_temp(i, temp_array[i]);
   }
-
-  for (int i=0;i<=n;i++)
+  tft_init();
+  plot_axis();
+  for (int i=0;i<n;i++)
   {
     plot_iv(i);
   }
