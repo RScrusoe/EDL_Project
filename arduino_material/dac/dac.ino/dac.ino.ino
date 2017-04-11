@@ -1,10 +1,9 @@
-
 #include "AH_MCP4921.h"
-#define AI1 A1 
+int diode_pin = A2;
 AH_MCP4921 AnalogOutput(51,52,53);
 void setup() {
  AnalogOutput.setValue(0);
-  pinMode(AI1,INPUT);
+  pinMode(diode_pin,INPUT);
   Serial.begin(9600);
 }
 
@@ -17,13 +16,12 @@ void loop() {
   Serial.print(";");
   delay(10);
 
-  int AO1 = analogRead(AI1);
+  int Vd = analogRead(diode_pin);
   delay(10);
   
   Serial.print("AO1="); 
-  Serial.print(AO1);
+  Serial.print(Vd);
   Serial.print("\t");
   Serial.println();
  }
 }
-

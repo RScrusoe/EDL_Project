@@ -3,10 +3,12 @@
 #include <Keypad.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "SPI.h" // necessary library
-#define DATAOUT     51 //51 for Mega   //11for UNO //MOSI    //MCP Pin 4
-#define SPICLOCK    52 //52 for Mega   // 13 for UNO //sck   //MCP Pin 3
-#define SLAVESELECT 53 //53 for Mega   //10  for UNO  //ss   //MCP Pin 2
+#include "AH_MCP4921.h"
+AH_MCP4921 AnalogOutput(51,52,53);
+//#include "SPI.h" // necessary library
+//#define DATAOUT     51 //51 for Mega   //11for UNO //MOSI    //MCP Pin 4
+//#define SPICLOCK    52 //52 for Mega   // 13 for UNO //sck   //MCP Pin 3
+//#define SLAVESELECT 53 //53 for Mega   //10  for UNO  //ss   //MCP Pin 2
 #include <UTFT.h>
 extern uint8_t SmallFont[];
 
@@ -77,4 +79,4 @@ float current_current;
 float curr_time,prev_error=0;
 float iv_data[10][21];
 byte  temp_array[5] = {0,0,0,0,0};
-int trigger = A10;
+

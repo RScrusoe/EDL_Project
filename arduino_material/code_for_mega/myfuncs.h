@@ -1,6 +1,6 @@
 #pragma once
 #include "myvars.h"
-
+#include "AH_MCP4921.h"
 void tft_init();
 void plot_iv( int count);
 byte *ask_temps();
@@ -9,11 +9,12 @@ float minNum(float *z, int zsize);
 int get_input_temp();
 float find_current();
 float get_temp();
-void send_data(int a);
+//void send_data(int a);
 void print_iv(float Vd);
 void achieve_temp(int count, int temp_setpoint);
 void isort(byte *a, int n);
-void plot_axis();
+void plot_iv_axis();
+void plot_temp_axis();
 
 void tft_init()
 {
@@ -24,21 +25,57 @@ void tft_init()
   myGLCD.fillRect(0, 226, 319, 239);
   myGLCD.setColor(255, 255, 255);
   myGLCD.setBackColor(255, 0, 0);
-  myGLCD.print("* PELTIER TEMPERATURE SETTABLE PLATFORM*", CENTER, 1);
+  myGLCD.print("* TEMPERATURE SETTABLE PLATFORM*", CENTER, 1);
   myGLCD.setBackColor(64, 64, 64);
   myGLCD.setColor(255, 255, 0);
-  myGLCD.print("YASHASWI  |  RAHUL  | UDAY", CENTER, 227);
+  myGLCD.print("YASHASHWI  |  RAHUL  | UDAY", CENTER, 227);
 
   myGLCD.setColor(0, 0, 255);
   //myGLCD.drawRect(0, 14, 319, 225);
 
 }
 
-void plot_axis()
+void plot_temp_axis()
 {
   myGLCD.setColor(0, 0, 255);
-  myGLCD.drawLine(10, 218, 318, 218);
-  myGLCD.drawLine(10, 15 , 10, 218);
+  myGLCD.drawLine(15, 218, 318, 218);  // xaxis
+  myGLCD.drawLine(15, 15 , 15, 218);   // yaxis
+  myGLCD.setBackColor(0,0,0);
+  myGLCD.print("0  1   2   3   4   5   6   7   8   9 M",10,227);
+  myGLCD.print("*C",-1,16);  
+  myGLCD.print("70",-1,38);
+  myGLCD.print("60",-1,60);
+  myGLCD.print("50",-1,82);
+  myGLCD.print("40",-1,104);
+  myGLCD.print("30",-1,126);
+  myGLCD.print("20",-1,148);
+  myGLCD.print("10",-1,170);
+  myGLCD.print("05",-1,192);
+}
+ 
+void plot_iv_axis()
+{
+  myGLCD.setColor(0, 0, 255);
+  myGLCD.drawLine(15, 218, 318, 218);  // xaxis
+  myGLCD.drawLine(15, 15 , 15, 218);   // yaxis
+  myGLCD.setBackColor(0,0,0);
+  myGLCD.print("0 .1  .2  .3  .4  .5  .6  .7  .8  .9 V",10,227);
+  myGLCD.print("mA",-1,16);
+  myGLCD.print("14",-1,30);
+  myGLCD.print("13",-1,44);
+  myGLCD.print("12",-1,58);
+  myGLCD.print("11",-1,72);
+  myGLCD.print("10",-1,86);
+  myGLCD.print("9",0,100);
+  myGLCD.print("8",0,114);
+  myGLCD.print("7",0,128);
+  myGLCD.print("6",0,142);
+  myGLCD.print("5",0,156);
+  myGLCD.print("4",0,170); 
+  myGLCD.print("3",0,184);
+  myGLCD.print("2",0,198);
+  myGLCD.print("1",0,210);
+  
 }
 
 void plot_iv(int count)
@@ -51,10 +88,10 @@ void plot_iv(int count)
 
 
   if (count == 0) {myGLCD.setColor(255, 102, 0);}
-  else if (count == 0) {myGLCD.setColor(255, 255, 0);}
-  else if (count == 0) {myGLCD.setColor(0, 255, 0);}
-  else if (count == 0) {myGLCD.setColor(26, 255, 255);}
-  else if (count == 0) {myGLCD.setColor(255, 26, 255);}
+  else if (count == 1) {myGLCD.setColor(255, 255, 0);}
+  else if (count == 2) {myGLCD.setColor(0, 255, 0);}
+  else if (count == 3) {myGLCD.setColor(26, 255, 255);}
+  else if (count == 4) {myGLCD.setColor(255, 26, 255);}
 
   float xpixel [xsize];
   float ypixel [xsize];
@@ -62,8 +99,8 @@ void plot_iv(int count)
   int i = 0;
   for (i = 0; i < xsize; i++)
   {
-    xpixel[i] = 10 + iv_data[2 * count][i] * (310.0 - 10.0) / (1.0 - 0.0);
-    ypixel[i] = (218.0 - iv_data[2 * count + 1][i] * (218.0 - 15.0) / (5.0 - 0.0) ) ; //          (float) map(y[i],0.0,15.0,15.0,218.0);
+    xpixel[i] = 15 + iv_data[2 * count][i] * (310.0 - 15.0) / (1.0 - 0.0);
+    ypixel[i] = (218.0 - iv_data[2 * count + 1][i] * (218.0 - 15.0) / (15.0 - 0.0) ) ; //          (float) map(y[i],0.0,15.0,15.0,218.0);
     Serial.println(i + String(") ") + xpixel[i] + String(" || ") + ypixel[i]);
   }
   i = 0;
@@ -96,7 +133,7 @@ void plot_iv(int count)
   }
   Serial.println();
 
-  myGLCD.print(temp_array[count] + "*C", 25, 25 + 10 * count);
+  //myGLCD.print(temp_array[count] + "*C", 45, 45 + 10 * count);
 
 }
 
@@ -196,18 +233,18 @@ float get_temp()
   return cel;
 }
 
-void send_data(int a)
-{
-  digitalWrite(10, LOW);
-  data = highByte(a);
-  data = 0b00001111 & data;
-  data = 0b00110000 | data;
-  SPI.transfer(data);
-  data = lowByte(a);
-  SPI.transfer(data);
-  digitalWrite(10, HIGH);
-  delay(500);
-}
+//void send_data(int a)
+//{
+//  digitalWrite(10, LOW);
+//  data = highByte(a);
+//  data = 0b00001111 & data;
+//  data = 0b00110000 | data;
+//  SPI.transfer(data);
+//  data = lowByte(a);
+//  SPI.transfer(data);
+//  digitalWrite(10, HIGH);
+//  delay(500);
+//}
 
 void print_iv(float Vd)
 {
@@ -229,10 +266,10 @@ void achieve_temp(int count, int temp_setpoint)
   int flag2 = 0;
   float tmp_time = millis() / 1000.0;
   if (count == 0) {myGLCD.setColor(255, 102, 0);}
-  else if (count == 0) {myGLCD.setColor(255, 255, 0);}
-  else if (count == 0) {myGLCD.setColor(0, 255, 0);}
-  else if (count == 0) {myGLCD.setColor(26, 255, 255);}
-  else if (count == 0) {myGLCD.setColor(255, 26, 255);}
+  else if (count == 1) {myGLCD.setColor(255, 255, 0);}
+  else if (count == 2) {myGLCD.setColor(0, 255, 0);}
+  else if (count == 3) {myGLCD.setColor(26, 255, 255);}
+  else if (count == 4) {myGLCD.setColor(255, 26, 255);}
 
   initial_temp = get_temp();
   Serial.println("Current Temp = " + String(initial_temp) + "*C   ||  " + "Temp Setpoint = " + String(temp_setpoint) + "*C");
@@ -257,12 +294,12 @@ void achieve_temp(int count, int temp_setpoint)
   }
 
 
-  while (abs(error) >= 2 || ct <= 1)
+  while (abs(error) >= 2 || ct <= 4)
   {
     curr_time = millis() / 1000.0 - tmp_time;
     old_temp = curr_temp;
-    currx = 10.0 + curr_time * (310.0 - 10.0) / 1000.0;
-    curry = 218.0 - curr_temp * (218.0 - 15.0) / (70.0 - 5.0);
+    currx = 15.0 + curr_time * (318.0 - 15.0) / 600.0;
+    curry = 218.0 - curr_temp * (218.0 - 15.0) / (85.0 - 5.0);
     if (!flag2) 
     {
       prevx = currx;
@@ -270,7 +307,7 @@ void achieve_temp(int count, int temp_setpoint)
       flag2 = 1;
     }
     myGLCD.drawLine(prevx,prevy,currx,curry);
-    myGLCD.fillCircle(currx , curry , 2 ); // Assuming max time takes is 1000s;
+    myGLCD.fillCircle(currx , curry , 2 );                    // Assuming max time taken is 1000s;
     prevx = currx;
     prevy = curry;
     new_pwm = old_pwm + error * Kp; // + Kd*(error-prev_error));
@@ -282,17 +319,17 @@ void achieve_temp(int count, int temp_setpoint)
     //duty = 0.99 * 255;
     duty = new_pwm * 255;
     analogWrite(pwm_pin, duty);
-    current_current = find_current();
+    //current_current = find_current();
     Serial.print(duty);
-    Serial.print("  ||  current = ");
-    Serial.print(current_current);
-    Serial.print("V  ||  time in secs: ");
+    //Serial.print("  ||  current = ");
+    //Serial.print(current_current);
+    Serial.print("  ||  time in secs: ");
     Serial.print(curr_time);
     Serial.print("  ||  ");
     Serial.print(curr_temp);
     Serial.print("  ||  ");
     Serial.println(new_pwm);
-    delay(10000);
+    delay(2000);
     curr_temp = get_temp();
     if (!flag)
     {
@@ -312,13 +349,14 @@ void achieve_temp(int count, int temp_setpoint)
   Serial.print("Maintaining Temperature at "); Serial.print(temp_setpoint); Serial.println(" *C");
   analogWrite(pwm_pin, duty);
 
-  analogWrite(trigger,255);
 //delay(1500);
 
-  for (int a = 0; a <= 4095; a = a + 200 )
+  for (int a = 0; a <= 4095; a = a + 200)
   {
     in_volt = a;
 //    send_data(a);
+    AnalogOutput.setValue(a); 
+    delay(20);
     Vd = analogRead(diode_pin);
     Vd = (Vd / 1024.0) * 5.0;
     in_volt = (in_volt / 4096.0) * 5.0;
