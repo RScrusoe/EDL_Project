@@ -16,6 +16,8 @@ void isort(byte *a, int n);
 void plot_iv_axis();
 void plot_temp_axis();
 
+
+//This function initializes GLCD with heading and group member names
 void tft_init()
 {
   myGLCD.clrScr();
@@ -35,6 +37,7 @@ void tft_init()
 
 }
 
+//This function draws axis and its coordinate values on glcd for temperature vs time graph
 void plot_temp_axis()
 {
   myGLCD.setColor(0, 0, 255);
@@ -53,6 +56,7 @@ void plot_temp_axis()
   myGLCD.print("05",-1,192);
 }
  
+//This function draws axis and its coordinate values on glcd for IV graph
 void plot_iv_axis()
 {
   myGLCD.setColor(0, 0, 255);
@@ -78,6 +82,7 @@ void plot_iv_axis()
   
 }
 
+//This function draws IV characteristics on glcd
 void plot_iv(int count)
 {
   int xsize = 21;
@@ -96,6 +101,8 @@ void plot_iv(int count)
   float xpixel [xsize];
   float ypixel [xsize];
 
+  
+ //***Converting IV values to x,y pixel values for drawing on GLCD
   int i = 0;
   for (i = 0; i < xsize; i++)
   {
@@ -105,6 +112,7 @@ void plot_iv(int count)
   }
   i = 0;
 
+ //Drawing line to make graph continues
   for (i = 0; i < (xsize - 1); i++)
   {
     myGLCD.drawLine(xpixel[i], ypixel[i], xpixel[i + 1], ypixel[i + 1]);
@@ -112,12 +120,13 @@ void plot_iv(int count)
   i = 0;
   //Serial.println("@@@");
   //myGLCD.setColor(255, 0, 0);
+//  drawing point circle for showing IV point on GLCD
   for (i = 0; i < xsize; i++)
   {
     myGLCD.fillCircle( xpixel[i], ypixel[i], 3);
   }
 
-
+//Print out IV values on serial monitor
   i = 0;
   Serial.print("Voltages = {");
   for (i = 0; i < xsize; i++)
@@ -137,6 +146,9 @@ void plot_iv(int count)
 
 }
 
+//This function asks input number of temperatures
+//Then it takes input of all the temperatures using keypad
+//And prints them on GLCD
 byte * ask_temps()
 {
   myGLCD.print("Please Enter Number Of Temperatures :: ", CENTER, 100);
@@ -162,6 +174,7 @@ byte * ask_temps()
   //    n=n-1;
   //  }
 
+ //This function sorts a given array
   isort(temp_array, n);
 
   for (int i = 0; i < t; i++) {
@@ -173,6 +186,7 @@ byte * ask_temps()
 
 }
 
+//This function finds maximum number of given array
 float maxNum(float *z, int zsize)
 {
   int i = 0;
@@ -184,6 +198,7 @@ float maxNum(float *z, int zsize)
   return max_val;
 }
 
+//This function finds minimum number of given array
 float minNum(float *z, int zsize)
 {
   int i = 0;
@@ -196,6 +211,7 @@ float minNum(float *z, int zsize)
   return min_val;
 }
 
+//This function uses keypad to take 2 digit input temperature
 int get_input_temp()
 {
   char key = kpd.waitForKey();
@@ -213,6 +229,7 @@ int get_input_temp()
   return temp;
 }
 
+//This function is to calculate current flowing through Peltier
 float find_current()
 {
   float x = analogRead(current_read_pin);
@@ -221,6 +238,7 @@ float find_current()
   //return(( 12.8 - (analogRead(current_read_pin)*5.0/1024.0))/0.1);
 }
 
+//This temperature reads using LM35
 float get_temp()
 {
   val = analogRead(tempPin);
@@ -246,6 +264,7 @@ float get_temp()
 //  delay(500);
 //}
 
+//This funtion prints IV values on serial monitor
 void print_iv(float Vd)
 {
   Vd = (Vd / 1024) * 5;
@@ -258,6 +277,7 @@ void print_iv(float Vd)
   Serial.println(current);
 }
 
+//******This is the main function which executes PID loop
 void achieve_temp(int count, int temp_setpoint)
 {
   int z = 0;
@@ -265,6 +285,8 @@ void achieve_temp(int count, int temp_setpoint)
   float prevx,prevy; 
   int flag2 = 0;
   float tmp_time = millis() / 1000.0;
+  
+  //Selecting different colors for different temperatures
   if (count == 0) {myGLCD.setColor(255, 102, 0);}
   else if (count == 1) {myGLCD.setColor(255, 255, 0);}
   else if (count == 2) {myGLCD.setColor(0, 255, 0);}
@@ -273,6 +295,8 @@ void achieve_temp(int count, int temp_setpoint)
 
   initial_temp = get_temp();
   Serial.println("Current Temp = " + String(initial_temp) + "*C   ||  " + "Temp Setpoint = " + String(temp_setpoint) + "*C");
+ 
+  //setting up relay direction according to given input temperature
   if (initial_temp > temp_setpoint)
   {
     Serial.println("Writing Relay -> LOW");
@@ -293,11 +317,13 @@ void achieve_temp(int count, int temp_setpoint)
     prev_error = error;
   }
 
-
-  while (abs(error) >= 2 || ct <= 4)
+//Execute this while loop if error is more than +/- 2*C
+//Also, if error is within +/- 2*C for continues 5 cycles, then EXIT the loop
+  while (abs(error) >= 2 || ct <= 5)
   {
     curr_time = millis() / 1000.0 - tmp_time;
     old_temp = curr_temp;
+    //Converting current temo and time values to x,y pixel to plot temp VS time dynamically
     currx = 15.0 + curr_time * (318.0 - 15.0) / 600.0;
     curry = 218.0 - curr_temp * (218.0 - 15.0) / (85.0 - 5.0);
     if (!flag2) 
@@ -310,7 +336,7 @@ void achieve_temp(int count, int temp_setpoint)
     myGLCD.fillCircle(currx , curry , 2 );                    // Assuming max time taken is 1000s;
     prevx = currx;
     prevy = curry;
-    new_pwm = old_pwm + error * Kp; // + Kd*(error-prev_error));
+    new_pwm = old_pwm + error * Kp + Kd*(error-prev_error));    //PD loop
     prev_error = error;
     if (new_pwm >= 1)
     {
@@ -318,7 +344,7 @@ void achieve_temp(int count, int temp_setpoint)
     }
     //duty = 0.99 * 255;
     duty = new_pwm * 255;
-    analogWrite(pwm_pin, duty);
+    analogWrite(pwm_pin, duty);           //writing the pwm with calculated duty cycle to the programmable current source
     //current_current = find_current();
     Serial.print(duty);
     //Serial.print("  ||  current = ");
@@ -350,7 +376,9 @@ void achieve_temp(int count, int temp_setpoint)
   analogWrite(pwm_pin, duty);
 
 //delay(1500);
-
+//Once Temperature is maintained at setpoint,
+//varible voltage is written on diode_pin
+//This will voltage on the diode pin so that we can study IV characteristics
   for (int a = 0; a <= 4095; a = a + 200)
   {
     in_volt = a;
@@ -371,6 +399,7 @@ void achieve_temp(int count, int temp_setpoint)
 
 }
 
+//This function sorts the given array in assending order
 void isort(byte *a, int n)
 {
   for (int i = 1; i < n; ++i)
